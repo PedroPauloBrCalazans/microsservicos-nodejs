@@ -2,10 +2,11 @@
   "name": "app-orders",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/http/server.js",
   "scripts": {
     "dev": "tsx watch src/http/server.ts",
-    "start": "tsx watch src/http/server.ts"
+    "build": "tsc",
+    "start": "node dist/http/server.js"
   },
   "keywords": [],
   "author": "",
