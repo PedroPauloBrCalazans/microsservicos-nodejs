@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --experimental-strip-types --watch --no-warnings src/server.ts",
-    "start": "node --experimental-strip-types --no-warnings src/server.ts"
+    "dev": "tsx watch src/http/server.ts",
+    "start": "tsx watch src/http/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +15,10 @@
     "fastify": "^5.3.3",
     "fastify-type-provider-zod": "^4.0.2",
     "zod": "^3.25.51"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }
