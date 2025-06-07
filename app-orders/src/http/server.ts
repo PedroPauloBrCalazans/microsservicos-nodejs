@@ -10,6 +10,7 @@ import {
 import { channels } from "../broker/channels/index.ts";
 import { db } from "../db/client.ts";
 import { schema } from "../db/schema/index.ts";
+import { dispatchOrderCreated } from "../broker/messages/order-created.ts";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -38,18 +39,31 @@ app.post(
 
     console.log("Create an order with amount", amount);
 
-    channels.orders.sendToQueue(
-      "orders",
-      Buffer.from(JSON.stringify({ amount }))
-    );
+    const orderId = randomUUID();
 
-    await db.insert(schema.orders).values({
-      id: randomUUID(),
-      customerId: "81360b12-3eef-4ebd-ae5e-d32b9ac87788",
+    dispatchOrderCreated({
+      orderId,
       amount,
+      customer: {
+        id: "81360b12-3eef-4ebd-ae5e-d32b9ac87788",
+      },
     });
 
-    return response.status(201).send();
+    try {
+      await db.insert(schema.orders).values({
+        id: orderId,
+        customerId: "81360b12-3eef-4ebd-ae5e-d32b9ac87788",
+        amount,
+      });
+
+      return response.status(201).send();
+    } catch (err) {
+      console.error("Erro ao criar pedido:", err);
+      return response.status(500).send({
+        message: "Erro ao criar pedido",
+        error: (err as Error).message,
+      });
+    }
   }
 );
 
