@@ -1,6 +1,10 @@
+import "@opentelemetry/auto-instrumentations-node/register";
+
 import { fastify } from "fastify";
 import { fastifyCors } from "@fastify/cors";
 import { randomUUID } from "node:crypto";
+import { setTimeout } from "node:timers/promises";
+import { trace } from "@opentelemetry/api";
 import { z } from "zod";
 import {
   serializerCompiler,
@@ -11,6 +15,7 @@ import { channels } from "../broker/channels/index.ts";
 import { db } from "../db/client.ts";
 import { schema } from "../db/schema/index.ts";
 import { dispatchOrderCreated } from "../broker/messages/order-created.ts";
+import { tracer } from "../tracer/tracer.ts";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -41,19 +46,27 @@ app.post(
 
     const orderId = randomUUID();
 
-    dispatchOrderCreated({
-      orderId,
-      amount,
-      customer: {
-        id: "81360b12-3eef-4ebd-ae5e-d32b9ac87788",
-      },
-    });
-
     try {
       await db.insert(schema.orders).values({
         id: orderId,
         customerId: "81360b12-3eef-4ebd-ae5e-d32b9ac87788",
         amount,
+      });
+
+      const span = tracer.startSpan("Pode ser aqui o B.O"); //quanto tempo está levando a operação
+
+      await setTimeout(2000);
+
+      span.end(); // colocar no final do codigo que eu acho que está com B.O
+
+      trace.getActiveSpan()?.setAttribute("order_id", orderId); //vou pegar a requisição atual
+
+      dispatchOrderCreated({
+        orderId,
+        amount,
+        customer: {
+          id: "81360b12-3eef-4ebd-ae5e-d32b9ac87788",
+        },
       });
 
       return response.status(201).send();
