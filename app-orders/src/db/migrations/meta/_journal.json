@@ -8,6 +8,20 @@
       "when": 1749175509548,
       "tag": "0000_hard_king_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1749239016071,
+      "tag": "0001_lethal_sunspot",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1749240115803,
+      "tag": "0002_futuristic_preak",
+      "breakpoints": true
     }
   ]
 }

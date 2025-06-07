@@ -8,6 +8,8 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { channels } from "../broker/channels/index.ts";
+import { db } from "../db/client.ts";
+import { schema } from "../db/schema/index.ts";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -31,7 +33,7 @@ app.post(
       }),
     },
   },
-  (request, response) => {
+  async (request, response) => {
     const { amount } = request.body;
 
     console.log("Create an order with amount", amount);
@@ -40,6 +42,12 @@ app.post(
       "orders",
       Buffer.from(JSON.stringify({ amount }))
     );
+
+    await db.insert(schema.orders).values({
+      id: randomUUID(),
+      customerId: "81360b12-3eef-4ebd-ae5e-d32b9ac87788",
+      amount,
+    });
 
     return response.status(201).send();
   }
